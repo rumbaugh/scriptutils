@@ -180,7 +180,7 @@ print TEX "\\setlength\\textheight{10.25in}\n";
 
 }
 
-print TEX "\\usepackage{epsfig}\n";
+print TEX "\\usepackage{epsfig,graphicx}\n";
 print TEX "\\begin{document}\n";
 
 if (defined($pnums)){
@@ -261,7 +261,7 @@ for ($l=0; $l<$npages; $l++){
       }
 
       print TEX "\\begin{minipage}[b]{$dx\\linewidth}\n";
-      print TEX "\\centering\\epsfig{file=$file[$k],$y=\\linewidth,angle=$theta,clip=}\n";
+      print TEX "\\centering\\includegraphics[$y=\\linewidth]{$file[$k]}\n";
       ($titlise) and print TEX "\\footnotesize\\verb=$shortname=\n";
 
       print TEX "\\end{minipage} \\hfill\n";
@@ -282,17 +282,20 @@ for ($l=0; $l<$npages; $l++){
 print TEX "\\end{document}\n";
 close(TEX);
 
+&esystem("cp gallery.tex /home/rumbaugh/gallerytest/gallerytest.tex",$doproc,$verb);
+
 # Now do system calls to latex and dvips, and clean up:
 
 if ($pdf) {
   ($verb>0) and print STDOUT "Running pdflatex...\n";
-  &esystem("echo x | pdflatex $texfile >& $reportfile",$doproc,$verb);
+  #&esystem("echo x | pdflatex $texfile &> $reportfile",$doproc,$verb);
+  &esystem("pdflatex $texfile",$doproc,$verb);
   &esystem("mv gallery.pdf $outfile",$doproc,$verb);
 } else {
   ($verb>0) and print STDOUT "Running latex...\n";
-  &esystem("echo x | latex $texfile >& $reportfile",$doproc,$verb);
+  &esystem("echo x | latex $texfile &> $reportfile",$doproc,$verb);
   ($verb>0) and print STDOUT "Running dvips...\n";
-  &esystem("dvips -f -Pcmz $dvifile -o $outfile >> $reportfile 2>&1",$doproc,$verb);
+  &esystem("dvips -f -Pcmz $dvifile -o $outfile >> $reportfile 2&>1",$doproc,$verb);
 }
 
 # Clean up:
